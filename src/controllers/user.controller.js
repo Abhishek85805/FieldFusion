@@ -23,14 +23,14 @@ const createAccessAndRefreshToken = async(userId) => {
 const register = asyncHandler(async(req, res) => {
     const {username, email, password, role} = req.body;
     if([username, email, password, role].some(field => field?.trim() === "")){
-        throw ApiError(400, "All the fields are required!!");
+        throw new ApiError(400, "All the fields are required!!");
     }
 
     const existedUser = await User.findOne({
         $or: [{username} || {email}]
     });
     if(existedUser){
-        throw ApiError(409, "User with email or username already exist!!");
+        throw new ApiError(409, "User with email or username already exist!!");
     }
 
     let avatarImagePath;
