@@ -130,7 +130,7 @@ const logout = asyncHandler(async(req, res)=>{
     .json(
         new ApiResponse(200, {}, "User logged out")
     )
-})
+});
 
 const refreshAccessToken = asyncHandler(async(req, res) => {
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
@@ -166,11 +166,38 @@ const refreshAccessToken = asyncHandler(async(req, res) => {
                 "Access token refreshed"
             )
         )
-})
+});
+
+const changeCurrentPassword = asyncHandler(async(req, res) => {
+    const {oldPassword, newPassword} = req.body;
+    if([oldPassword, newPassword].some(field => field?.trim === "")){
+        throw new ApiError(400, "All the fields are required!!");
+    }
+
+    const user = await User.findById(req.user?._id);
+    const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
+    if(!isPasswordCorrect){
+        throw new ApiError(400, "Invalid old password!!");
+    }
+
+    user.password = newPassword;
+    user.save({validateBeforeSave: true});
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            {}, 
+            "Password changed successfully!!"
+        )
+    );
+});
 
 export {
     register,
     login, 
     logout,
-    refreshAccessToken
+    refreshAccessToken,
+    changeCurrentPassword
 };
