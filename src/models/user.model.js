@@ -39,7 +39,7 @@ const userSchema = new Schema(
         bookingHistory:[
             {
                 type: Schema.Types.ObjectId,
-                ref: "Booking"
+                ref: "Slot"
             }
         ],
 

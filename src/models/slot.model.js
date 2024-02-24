@@ -1,23 +1,27 @@
 import mongoose, { Schema } from "mongoose";
 
-const bookingSchema = new Schema(
+const slotSchema = new Schema(
     {
         date: {
-            type: Date,
+            type: String,
             required: true,
         }, 
         startTime: {
-            type: Date,
+            type: Number,
             required: true,
         }, 
         endTime: {
-            type: Date,
+            type: Number,
             required: true,
         },
         status: {
             type: String,
             required: true,
             trim: true
+        },
+        owner: {
+            type: Schema.Types.ObjectId,
+            ref: "User"
         }
     },
     {
@@ -25,4 +29,4 @@ const bookingSchema = new Schema(
     }
 );
 
-export const Booking = mongoose.model("Booking", bookingSchema);
+export const Slot = mongoose.model("Slot", slotSchema);

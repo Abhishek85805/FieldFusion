@@ -16,4 +16,7 @@ app.use(cookieParser());
 import userRouter from "./routes/user.route.js";
 app.use("/api/v1/users", userRouter);
 
+import slotRouter from "./routes/slot.route.js";
+app.use("/api/v1/slots", slotRouter);
+
 export default app;
