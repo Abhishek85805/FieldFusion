@@ -206,11 +206,40 @@ const getCurrentUser = asyncHandler(async(req, res) => {
     )
 });
 
+const bookingHistory = asyncHandler(async(req, res) => {
+    const user = await User.aggregate([
+        {
+          $match: {
+            _id: req.user._id
+          }
+        },
+        {
+          $lookup: {
+            from: "slots",
+            localField: "bookingHistory",
+            foreignField: "_id",
+            as: "bookingHistory"
+          }
+        }
+    ]);
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            user[0].bookingHistory,
+            "History fetched successfully"
+        )
+    );
+})
+
 export {
     register,
     login, 
     logout,
     refreshAccessToken,
     changeCurrentPassword,
-    getCurrentUser
+    getCurrentUser,
+    bookingHistory
 };
