@@ -27,6 +27,7 @@ const bookSlot = asyncHandler(async(req, res) => {
     }
 
     const {startTimeAdjusted, endTimeAdjusted} = convertStringToHours(startTime, endTime);
+    console.log(startTimeAdjusted, endTimeAdjusted);
 
     const existingSlots = await Slot.find({
         $or: [
@@ -65,6 +66,21 @@ const bookSlot = asyncHandler(async(req, res) => {
     )
 });
 
+const getAllSlots = asyncHandler(async(req, res) => {
+    const slots = await Slot.find({});
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            slots,
+            "Slots fetched successfully"
+        )
+    );
+})
+
 export {
-    bookSlot
+    bookSlot,
+    getAllSlots
 }
