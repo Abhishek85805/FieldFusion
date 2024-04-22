@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { User } from "../models/user.model.js";
 import { Slot } from "../models/slot.model.js";
 import ApiResponse from "../utils/ApiResponse.js";
@@ -18,6 +19,26 @@ const convertStringToHours = (startTime, endTime) => {
     }
 
     return {startTimeAdjusted, endTimeAdjusted};
+}
+
+const createSlotsForDay = (date) => {
+    const startTime = moment(`${date}T05:00:00`); 
+    const endTime = moment(`${date}T23:00:00`);
+
+    const interval = 1;
+    const slots = [];
+
+    while (startTime.isBefore(endTime)) {
+        const slot = {
+            date: startTime.format('YYYY-MM-DD'),
+            startTime: startTime.hour(),
+            endTime: startTime.add(interval, 'hours').hour(),
+            status: 'available', 
+        };
+        slots.push(slot);
+    }
+
+    return slots;
 }
 
 const bookSlot = asyncHandler(async(req, res) => {
@@ -80,7 +101,38 @@ const getAllSlots = asyncHandler(async(req, res) => {
     );
 })
 
+const getAvailableSlots = asyncHandler(async(req, res) => {
+    const {date} = req.body;
+    const bookedSlots = await Slot.find({date: date})
+
+    const allSlots = createSlotsForDay(date);
+
+    const availableSlots = allSlots.filter(slot => {
+        for (const bookedSlot of bookedSlots) {
+          if (
+            slot.date === bookedSlot.date &&
+            slot.startTime >= bookedSlot.startTime &&
+            slot.endTime <= bookedSlot.endTime
+          ) {
+            return false;
+          }
+        }
+        return true;
+    });
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            availableSlots,
+            "Available Slots fetched successfully"
+        )
+    )
+}) 
+
 export {
     bookSlot,
-    getAllSlots
+    getAllSlots,
+    getAvailableSlots
 }
