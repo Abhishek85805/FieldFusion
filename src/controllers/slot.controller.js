@@ -1,4 +1,5 @@
 import moment from 'moment';
+import nodemailer from 'nodemailer'
 import { User } from "../models/user.model.js";
 import { Slot } from "../models/slot.model.js";
 import ApiResponse from "../utils/ApiResponse.js";
@@ -129,10 +130,37 @@ const getAvailableSlots = asyncHandler(async(req, res) => {
             "Available Slots fetched successfully"
         )
     )
-}) 
+})
+
+const mail = asyncHandler(async(req, res) => {
+    const {mailId} = req.body;
+    if(!mailId) throw ApiError(400, "Mail Id is required");
+
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: process.env.MAIL_ID,
+            pass: process.env.MAIL_ID_PASS
+        },
+    });
+
+    const info = await transporter.sendMail({
+        from: process.env.MAIL_ID,
+        to: mailId,
+        subject: "Confirmation",
+        text: "Slot is booked successfully",
+    });
+
+    return res.status(200).json({
+        status: "success",
+        data: info,
+        message: "Email sent successfully"
+    });
+});
 
 export {
     bookSlot,
     getAllSlots,
-    getAvailableSlots
+    getAvailableSlots,
+    mail
 }
