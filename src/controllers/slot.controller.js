@@ -104,6 +104,8 @@ const getAllSlots = asyncHandler(async(req, res) => {
 
 const getAvailableSlots = asyncHandler(async(req, res) => {
     const {date} = req.body;
+    if(!date) throw new ApiError(400, "date is required");
+
     const bookedSlots = await Slot.find({date: date})
 
     const allSlots = createSlotsForDay(date);
@@ -134,7 +136,7 @@ const getAvailableSlots = asyncHandler(async(req, res) => {
 
 const mail = asyncHandler(async(req, res) => {
     const {mailId} = req.body;
-    if(!mailId) throw ApiError(400, "Mail Id is required");
+    if(!mailId) throw new ApiError(400, "Mail Id is required");
 
     const transporter = nodemailer.createTransport({
         service: "gmail",
