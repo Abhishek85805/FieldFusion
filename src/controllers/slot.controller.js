@@ -102,7 +102,7 @@ const getAllSlots = asyncHandler(async(req, res) => {
     );
 })
 
-const getAvailableSlots = asyncHandler(async(req, res) => {
+/* const getAvailableSlots = asyncHandler(async(req, res) => {
     const {date} = req.body;
     if(!date) throw new ApiError(400, "date is required");
 
@@ -132,7 +132,61 @@ const getAvailableSlots = asyncHandler(async(req, res) => {
             "Available Slots fetched successfully"
         )
     )
-})
+}) */
+
+const getAvailableSlots = asyncHandler(async (req, res) => {
+    const { date } = req.body;
+    if (!date) throw new ApiError(400, "Date is required");
+
+    const currentDate = new Date();
+    const providedDate = new Date(date);
+
+    const isToday = currentDate.toDateString() === providedDate.toDateString();
+    console.log(isToday);
+
+    let allSlots;
+
+    if (isToday) {
+        const currentTime = currentDate.getHours();
+        console.log(currentTime);
+        const bookedSlots = await Slot.find({ date: date });
+
+        allSlots = createSlotsForDay(date).filter(slot => {
+            for (const bookedSlot of bookedSlots) {
+                if (
+                    slot.date === bookedSlot.date &&
+                    slot.startTime >= bookedSlot.startTime &&
+                    slot.endTime <= bookedSlot.endTime
+                ) {
+                    return false;
+                }
+            }
+            return slot.startTime > currentTime;
+        });
+    } else {
+        const bookedSlots = await Slot.find({ date: date });
+
+        allSlots = createSlotsForDay(date).filter(slot => {
+            for (const bookedSlot of bookedSlots) {
+                if (
+                    slot.date === bookedSlot.date &&
+                    slot.startTime >= bookedSlot.startTime &&
+                    slot.endTime <= bookedSlot.endTime
+                ) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
+
+    return res.status(200).json(new ApiResponse(
+        200,
+        allSlots,
+        "Available Slots fetched successfully"
+    ));
+});
+
 
 const mail = asyncHandler(async(req, res) => {
     const {mailId} = req.body;
