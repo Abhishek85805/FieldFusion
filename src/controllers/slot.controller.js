@@ -88,20 +88,6 @@ const bookSlot = asyncHandler(async(req, res) => {
     )
 });
 
-const getAllSlots = asyncHandler(async(req, res) => {
-    const slots = await Slot.find({});
-
-    return res
-    .status(200)
-    .json(
-        new ApiResponse(
-            200,
-            slots,
-            "Slots fetched successfully"
-        )
-    );
-})
-
 const getAvailableSlots = asyncHandler(async (req, res) => {
     const { date } = req.body;
     if (!date) throw new ApiError(400, "Date is required");
@@ -155,7 +141,6 @@ const getAvailableSlots = asyncHandler(async (req, res) => {
     ));
 });
 
-
 const mail = asyncHandler(async(req, res) => {
     const {mailId} = req.body;
     if(!mailId) throw new ApiError(400, "Mail Id is required");
@@ -184,7 +169,6 @@ const mail = asyncHandler(async(req, res) => {
 
 export {
     bookSlot,
-    getAllSlots,
     getAvailableSlots,
     mail
 }

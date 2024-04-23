@@ -7,7 +7,8 @@ import {
     refreshAccessToken,
     changeCurrentPassword,
     getCurrentUser,
-    bookingHistory
+    bookingHistory,
+    adminBookingSlots
 } from "../controllers/user.controller.js";
 import verifyJWT from "../middlewares/auth.middleware.js";
 
@@ -28,5 +29,7 @@ router.route("/refresh-token").post(refreshAccessToken);
 router.route("/change-password").post(verifyJWT, changeCurrentPassword);
 router.route("/current-user").get(verifyJWT, getCurrentUser);
 router.route("/booking-history").get(verifyJWT, bookingHistory);
+router.route("/admin-booking-slots").get(verifyJWT, adminBookingSlots);
+
 
 export default router;
