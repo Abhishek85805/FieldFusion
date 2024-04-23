@@ -22,6 +22,16 @@ const convertStringToHours = (startTime, endTime) => {
     return {startTimeAdjusted, endTimeAdjusted};
 }
 
+const convertToAmPm = (time) => {
+    if (time < 12) {
+        return time + "AM";
+    } else if (time === 12) {
+        return time + "PM";
+    } else {
+        return (time - 12) + "PM";
+    }
+}
+
 const createSlotsForDay = (date) => {
     const startTime = moment(`${date}T05:00:00`); 
     const endTime = moment(`${date}T23:00:00`);
@@ -96,7 +106,6 @@ const getAvailableSlots = asyncHandler(async (req, res) => {
     const providedDate = new Date(date);
 
     const isToday = currentDate.toDateString() === providedDate.toDateString();
-    console.log(isToday);
 
     let allSlots;
 
@@ -133,6 +142,11 @@ const getAvailableSlots = asyncHandler(async (req, res) => {
             return true;
         });
     }
+
+    allSlots.forEach(slot => {
+        slot.startTime = convertToAmPm(slot.startTime);
+        slot.endTime = convertToAmPm(slot.endTime);
+    });
 
     return res.status(200).json(new ApiResponse(
         200,
